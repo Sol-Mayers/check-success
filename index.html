@@ -1,0 +1,78 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Check-success</title>
+  <link href="css/style-min.css" rel="stylesheet">
+  <link href="css/normalize.css" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Sans+Condensed:wght@300;500;700&display=swap" rel="stylesheet">
+  <script src="js/vue.js"></script>
+</head>
+
+<body>
+  <header>
+  </header>
+  <main>
+    <div id="check-success">
+      <div class="main-wrap">
+        <h2 class="title-choice">Выбор показателя</h2>
+        <div class="make-choice">
+          <ul v-for="(parameter, index) in parameters">
+           <button @click="showParam(parameter)" class="name-of-param">{{ parameter.name }}</button>
+            <li class="parameter-item" v-if="parameter.show" :class="{makeanimation: parameter.show === true}">
+              <span class="write-wrap-under">
+              <input v-model="parameter.newValue" @input="parameter.newValue = parameter.newValue.replace(/[^\d]/g, '').replace(/\B(?=(?:\d{3})+(?!\d))/g, ' ')" class="write-field" :class="{disablefield: parameter.all.length === 12}" placeholder="Ввод...">
+              <button @click="addValue(index)" class="add-param-to-table" :disabled="parameter.all.length === 12 || parameter.newValue === ''" :class="{disablebutton: parameter.all.length === 12 || parameter.newValue === ''}">
+                <span @mouseover="showToolTip(parameter)" @mouseout="hideToolTip(parameter)" class="inside-param"></span>
+                <span class="tooltip">Заполните поле ввода</span>
+                Добавить
+              </button>
+              </span>
+              <span class="table-title">2021 год</span>
+              <svg class="wrap-graph">
+                <rect class="rect-graph"/>
+                <rect v-for="(item, index2) in parameter.all" class="circle-graph" width="90"
+                      :height="( Math.min(parameter.all.reduce((acc, curr) => Number(acc.digit.replace(/\B(?=(?:\d{3})+(?!\d))/g, ' ').replace(/[^\d]/g, '')) > Number(curr.digit.replace(/\B(?=(?:\d{3})+(?!\d))/g, ' ').replace(/[^\d]/g, '')) ? acc : curr).digit.replace(/\B(?=(?:\d{3})+(?!\d))/g, ' ').replace(/[^\d]/g, ''), Math.max(0, item.digit.replace(/\B(?=(?:\d{3})+(?!\d))/g, ' ').replace(/[^\d]/g, ''))) * ((190 - 10) / Math.min(parameter.all.reduce((acc, curr) => Number(acc.digit.replace(/\B(?=(?:\d{3})+(?!\d))/g, ' ').replace(/[^\d]/g, '')) > Number(curr.digit.replace(/\B(?=(?:\d{3})+(?!\d))/g, ' ').replace(/[^\d]/g, '')) ? acc : curr).digit.replace(/\B(?=(?:\d{3})+(?!\d))/g, ' ').replace(/[^\d]/g, ''))))"
+                      :x="xDigits[index2] - 45"
+                      :y="200 - ( Math.min(parameter.all.reduce((acc, curr) => Number(acc.digit.replace(/\B(?=(?:\d{3})+(?!\d))/g, ' ').replace(/[^\d]/g, '')) > Number(curr.digit.replace(/\B(?=(?:\d{3})+(?!\d))/g, ' ').replace(/[^\d]/g, '')) ? acc : curr).digit.replace(/\B(?=(?:\d{3})+(?!\d))/g, ' ').replace(/[^\d]/g, ''), Math.max(0, item.digit.replace(/\B(?=(?:\d{3})+(?!\d))/g, ' ').replace(/[^\d]/g, ''))) * ((190 - 10) / Math.min(parameter.all.reduce((acc, curr) => Number(acc.digit.replace(/\B(?=(?:\d{3})+(?!\d))/g, ' ').replace(/[^\d]/g, '')) > Number(curr.digit.replace(/\B(?=(?:\d{3})+(?!\d))/g, ' ').replace(/[^\d]/g, '')) ? acc : curr).digit.replace(/\B(?=(?:\d{3})+(?!\d))/g, ' ').replace(/[^\d]/g, ''))))"
+                      :fill=" 'rgb(255, 255, ' + (255 - ( Math.min(parameter.all.reduce((acc, curr) => Number(acc.digit.replace(/\B(?=(?:\d{3})+(?!\d))/g, ' ').replace(/[^\d]/g, '')) > Number(curr.digit.replace(/\B(?=(?:\d{3})+(?!\d))/g, ' ').replace(/[^\d]/g, '')) ? acc : curr).digit.replace(/\B(?=(?:\d{3})+(?!\d))/g, ' ').replace(/[^\d]/g, ''), Math.max(0, item.digit.replace(/\B(?=(?:\d{3})+(?!\d))/g, ' ').replace(/[^\d]/g, ''))) * ((190 - 10) / Math.min(parameter.all.reduce((acc, curr) => Number(acc.digit.replace(/\B(?=(?:\d{3})+(?!\d))/g, ' ').replace(/[^\d]/g, '')) > Number(curr.digit.replace(/\B(?=(?:\d{3})+(?!\d))/g, ' ').replace(/[^\d]/g, '')) ? acc : curr).digit.replace(/\B(?=(?:\d{3})+(?!\d))/g, ' ').replace(/[^\d]/g, ''))))) + ')' "/>
+              </svg>
+              <table class="parameter-table">
+                <tr class="table-row">
+                  <td class="table-cell" @click="custItem(item)" v-for="item in parameter.all">
+                    <span class="cast-item" v-if="item.customize === false">Ред.</span>
+                    <span class="tooltipsecond" :class="{showtool: item.customize === true && item.digit === ''}">Введите значение</span>
+                    <input type="text" v-if="item.customize === true" @keyup.enter="acceptChange(item)" v-model="item.digit" class="change-field" @input="item.digit = item.digit.replace(/[^\d]/g, '').replace(/\B(?=(?:\d{3})+(?!\d))/g, ' ')">
+                    {{ !item.customize ? item.digit.replace(/[^\d]/g, '').replace(/\B(?=(?:\d{3})+(?!\d))/g, ' ') : '' }}
+                  </td>
+                </tr>
+                <tr class="table-row">
+                  <td class="table-cell">Январь</td>
+                  <td class="table-cell">Февраль</td>
+                  <td class="table-cell">Март</td>
+                  <td class="table-cell">Апрель</td>
+                  <td class="table-cell">Май</td>
+                  <td class="table-cell">Июнь</td>
+                  <td class="table-cell">Июль</td>
+                  <td class="table-cell">Август</td>
+                  <td class="table-cell">Сентябрь</td>
+                  <td class="table-cell">Октябрь</td>
+                  <td class="table-cell">Ноябрь</td>
+                  <td class="table-cell">Декабрь</td>
+                </tr>
+              </table>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </main>
+  <footer>
+
+  </footer>
+  <script src="js/script.js"></script>
+</body>
+
+</html>
